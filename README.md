@@ -2,7 +2,7 @@
 
 A full-stack web app that helps Dallas residents find community resources — food banks, shelters, job centers, and health services.
 
-**Live demo:** [Add your Vercel URL here]
+**Live demo:** https://finder-dallas.vercel.app/
 
 ## What We Built
 
