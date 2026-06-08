@@ -2,20 +2,44 @@
 
 A full-stack web app that helps Dallas residents find community resources — food banks, shelters, job centers, and health services.
 
-[LIVE DEMO]: 
+**Live demo:** [Add your Vercel URL here]
 
-**Data:** The backend tries [OpenStreetMap Nominatim](https://nominatim.org/) first. If that fails (rate limits, no results, etc.) it falls back to **sample mock data** in the same response shape — so the app always works for demos. Swap in Google Places, Yelp, or any API you prefer for production.
+## What We Built
 
-## Tech Stack
+| Layer | Tech | Where it runs |
+|-------|------|---------------|
+| Frontend | React, TypeScript, Vite, Tailwind CSS | Vercel |
+| API | Vercel Serverless Function (`/api/places`) | Vercel (same domain) |
+| Local API (dev only) | Express + TypeScript | `localhost:5001` |
 
-- **Frontend:** React, TypeScript, Vite, Tailwind CSS
-- **Backend:** Node.js, Express, TypeScript
-- **Deploy:** Vercel (frontend + API). Render optional for local-style Express hosting.
+**Production = Vercel only.** One deploy hosts both the website and the API. No separate backend server.
+
+## How Data Works
+
+The live API returns **sample Dallas resource data** (mock) so search is fast and reliable for demos.
+
+- **Production (Vercel):** `/api/places` returns mock data instantly
+- **Local dev (Express):** tries [OpenStreetMap Nominatim](https://nominatim.org/) first, falls back to the same mock data if the API is slow or rate-limited
+
+The mock data uses the same shape as a real places API (`place_id`, `name`, `formatted_address`), so you can swap in Google Places, Yelp, or any API later without changing the frontend.
+
+## Project Structure
+
+```
+FinderDallas/
+├── frontend/
+│   ├── src/App.tsx          # React UI
+│   ├── api/places.ts        # Vercel serverless API (production)
+│   └── ...
+├── backend/                 # Express API (local dev only)
+│   └── src/routes/places.ts
+└── README.md
+```
 
 ## Local Dev
 
 ```bash
-# Terminal 1 — backend (port 5001)
+# Terminal 1 — Express backend (optional, port 5001)
 cd backend && npm install && npm run dev
 
 # Terminal 2 — frontend (port 5173)
@@ -24,56 +48,29 @@ cd frontend && npm install && npm run dev
 
 Open `http://localhost:5173`
 
-## Deploy
+The frontend uses `VITE_API_URL=http://localhost:5001` locally (see `frontend/.env.example`).
 
-### 1. Push to GitHub
+## Deploy (Vercel)
 
-```bash
-git init   # if not done yet
-git add .
-git commit -m "FinderDallas — ready to deploy"
-git remote add origin https://github.com/YOUR_USERNAME/FinderDallas.git
-git push -u origin main
-```
+1. Push repo to GitHub
+2. [vercel.com](https://vercel.com) → **Add New Project** → import repo
+3. **Root Directory:** `frontend`
+4. **Do not set `VITE_API_URL`** — production uses `/api/places` on the same Vercel URL
+5. Deploy
 
-### 2. Backend on Render
-
-1. Go to [render.com](https://render.com) → **New Web Service** → connect your repo
-2. Settings:
-   - **Root Directory:** `backend`
-   - **Build Command:** `npm install && npm run build`
-   - **Start Command:** `npm start`
-3. **Environment variables:**
-
-   | Key | Value |
-   |-----|-------|
-   | `FRONTEND_URL` | Your Vercel URL (add after step 3, e.g. `https://finder-dallas.vercel.app`) |
-
-4. Deploy → copy your Render URL (e.g. `https://finderdallas-api.onrender.com`)
-
-### 3. Frontend + API on Vercel (recommended)
-
-1. Go to [vercel.com](https://vercel.com) → **Add New Project** → import repo
-2. Settings:
-   - **Root Directory:** `frontend`
-   - **Framework:** Vite (auto-detected)
-3. **Do NOT set `VITE_API_URL`** — the app uses `/api/places` on the same Vercel domain (instant, no Render cold start).
-4. Deploy
-
-Test: open Vercel URL → pick a category → Search (should be instant).
-
-### Optional: Render backend
-
-Only needed if you want a separate Express server. Free Render spins down after idle (~60s first request). For demos, Vercel API alone is faster.
+Search should return results in under a second.
 
 ## API
 
 | Endpoint | Description |
 |----------|-------------|
-| `GET /api/health` | Health check |
 | `GET /api/places?category=food_bank` | Search resources |
 
-Categories: `food_bank`, `shelter`, `job_center`, `medical_center`
+**Categories:** `food_bank`, `shelter`, `job_center`, `medical_center`
+
+## Why Not Render?
+
+We initially deployed the Express backend on Render, but the free tier spins down after inactivity — the first search could take 60+ seconds. Moving the API to Vercel serverless functions on the same domain fixed that.
 
 ## License
 
