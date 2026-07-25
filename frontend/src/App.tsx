@@ -1,23 +1,20 @@
 import { useState } from 'react'
+import type { Place, CategoryId } from "./types"
 
-type Place = {
-  place_id: string;
-  name: string;
-  formatted_address: string;
-};
-
+/** Main component: UI + data layer. */
 function App()  {
-  const [category, setCategory] = useState("");
+  const [category, setCategory] = useState<CategoryId | "">(""); 
   const [places, setPlaces] = useState<Place[]>([]);
   const [loading, setLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
-  const categories = [
+  const categories: { id: CategoryId, name: string, description: string }[] = [
     { id: "food_bank", name: "Food Bank", description: "Food Banks provide food to those in need." },
     { id: "shelter", name: "Shelter", description: "Shelters provide housing to those in need." },
     { id: "job_center", name: "Job Center", description: "Job Centers provide job training and employment services." },
     { id: "medical_center", name: "Medical Center", description: "Medical Centers provide medical services to those in need." },
   ]
 
+  /** Search for places when user clicks "Search" button. */  
   async function handleSearch() {
     if (!category) return;
 
@@ -41,6 +38,7 @@ function App()  {
     }
   }
  
+  /** Render the main UI. */
   return (
     <div className="min-h-screen flex flex-col bg-gray-50 font-satoshi">
 
@@ -88,6 +86,7 @@ function App()  {
           </button>
         </div>
 
+        {/* Results section */}
         <section className="flex flex-col gap-3">
           <h3 className="text-lg font-bold text-center text-gray-800">Results</h3>
 
@@ -122,6 +121,7 @@ function App()  {
 
       </main>
 
+      {/* Footer */}
       <footer className="bg-gradient-to-r from-emerald-600 to-teal-500 text-white text-center text-sm py-4 px-4 shrink-0">
         Data © OpenStreetMap contributors
       </footer>

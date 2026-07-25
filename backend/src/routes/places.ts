@@ -29,22 +29,28 @@ const mockPlaces: Record<string, { place_id: string; name: string; formatted_add
     ],
 };
 
+/** Route to search for places. */
 router.get("/", async (req, res) => {
+    /** Get the category from the query parameters. */
     const category = req.query.category as string;
+    /** If no category is provided, return an error. */
     if (!category) {
         res.json({ error: "Category is required" });
         return;
     }
 
+    /** Get the search term for the category. */
     const searchTerm = categoryQueries[category as keyof typeof categoryQueries];
     if (!searchTerm) {
         res.json({ error: "Invalid category" });
         return;
     }
 
+    /** Construct the query URL. */
     const query = `${searchTerm} Dallas Texas`;
     const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=10&viewbox=-97.0,32.6,-96.5,33.0&bounded=1`;
 
+    /** Try to fetch the places from the Nominatim API. */
     try {
         const response = await fetch(url, {
             headers: {
@@ -52,14 +58,17 @@ router.get("/", async (req, res) => {
             }
         });
 
+        /** If the response is successful, parse the JSON data. */
         if (response.ok) {
             const data = await response.json();
+            /** If the data is an array and has items, map the data to the Place type. */
             if (Array.isArray(data) && data.length > 0) {
                 const results = data.map((place: { place_id: string; name?: string; display_name: string }) => ({
                     place_id: place.place_id,
                     name: place.name || place.display_name.split(",")[0],
                     formatted_address: place.display_name
                 }));
+                /** Return the results. */
                 res.json(results);
                 return;
             }

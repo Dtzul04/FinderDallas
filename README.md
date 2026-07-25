@@ -1,76 +1,99 @@
 # FinderDallas
 
-A full-stack web app that helps Dallas residents find community resources — food banks, shelters, job centers, and health services.
+Find community resources in Dallas — food banks, shelters, job centers, and medical centers.
 
 **Live demo:** https://finder-dallas.vercel.app/
 
-## What We Built
+## Stack
 
-| Layer | Tech | Where it runs |
-|-------|------|---------------|
-| Frontend | React, TypeScript, Vite, Tailwind CSS | Vercel |
-| API | Vercel Serverless Function (`/api/places`) | Vercel (same domain) |
-| Local API (dev only) | Express + TypeScript | `localhost:5001` |
+| Layer | Tech |
+|-------|------|
+| UI | React, TypeScript, Vite, Tailwind CSS |
+| API | Vercel Serverless Function (`/api/places`) |
+| Data | Typed mock data (`Place[]`) — ready to swap for Postgres or any API |
+| Local practice | Express + TypeScript (`backend/`) — optional |
 
-**Production = Vercel only.** One deploy hosts both the website and the API. No separate backend server.
+**Production = Vercel only** (frontend + API on one URL).
 
-## How Data Works
-
-The live API returns **sample Dallas resource data** (mock) so search is fast and reliable for demos.
-
-- **Production (Vercel):** `/api/places` returns mock data instantly
-- **Local dev (Express):** tries [OpenStreetMap Nominatim](https://nominatim.org/) first, falls back to the same mock data if the API is slow or rate-limited
-
-The mock data uses the same shape as a real places API (`place_id`, `name`, `formatted_address`), so you can swap in Google Places, Yelp, or any API later without changing the frontend.
-
-## Project Structure
+## Architecture (interview-ready)
 
 ```
-FinderDallas/
-├── frontend/
-│   ├── src/App.tsx          # React UI
-│   ├── api/places.ts        # Vercel serverless API (production)
-│   └── ...
-├── backend/                 # Express API (local dev only)
-│   └── src/routes/places.ts
-└── README.md
+Browser (App.tsx)
+    → GET /api/places?category=food_bank
+    → api/places.ts          (validate request)
+    → getPlaces(category)    (data layer)
+    → Place[]                (same shape always)
 ```
 
-## Local Dev
+| File | Role |
+|------|------|
+| `frontend/src/types.ts` | Shared types: `Place`, `CategoryId` |
+| `frontend/src/App.tsx` | UI + fetch |
+| `frontend/src/data/mockPlaces.ts` | Sample data + `getPlaces()` |
+| `frontend/api/places.ts` | HTTP handler only |
+| `backend/` | Local Express (OSM try + mock fallback) — not used in production |
+
+**Why mock first?** Demos stay fast and free. The UI only depends on `Place[]`. To use your own database or API later, change **only** `getPlaces` — keep returning `Place[]`.
+
+### Bring your own database (optional)
+
+`Place` shape:
+
+```ts
+type Place = {
+  place_id: string;
+  name: string;
+  formatted_address: string;
+};
+```
+
+Example table:
+
+```sql
+CREATE TABLE places (
+  place_id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  formatted_address TEXT NOT NULL,
+  category TEXT NOT NULL
+);
+```
+
+Then replace the body of `getPlaces` with a query filtered by `category`. Hosts: local Postgres, Neon, Supabase, etc. — any Postgres with a connection string works the same idea.
+
+## Local development
 
 ```bash
-# Terminal 1 — Express backend (optional, port 5001)
+# Optional: Express API on port 5001
 cd backend && npm install && npm run dev
 
-# Terminal 2 — frontend (port 5173)
+# Frontend on port 5173
 cd frontend && npm install && npm run dev
 ```
 
-Open `http://localhost:5173`
+Open http://localhost:5173
 
-The frontend uses `VITE_API_URL=http://localhost:5001` locally (see `frontend/.env.example`).
+- With Express: set `VITE_API_URL=http://localhost:5001` in `frontend/.env` (see `.env.example`)
+- Without Express: use `vercel dev` in `frontend/` so `/api/places` works, or keep pointing at the live API for UI-only work
 
-## Deploy (Vercel)
+## Deploy
 
-1. Push repo to GitHub
-2. [vercel.com](https://vercel.com) → **Add New Project** → import repo
-3. **Root Directory:** `frontend`
-4. **Do not set `VITE_API_URL`** — production uses `/api/places` on the same Vercel URL
-5. Deploy
-
-Search should return results in under a second.
+1. Push to GitHub  
+2. Vercel → import repo → **Root Directory:** `frontend`  
+3. Do **not** set `VITE_API_URL` (production uses same-origin `/api/places`)  
+4. Deploy  
 
 ## API
 
-| Endpoint | Description |
-|----------|-------------|
-| `GET /api/places?category=food_bank` | Search resources |
+`GET /api/places?category=<id>`
 
-**Categories:** `food_bank`, `shelter`, `job_center`, `medical_center`
+Categories: `food_bank` | `shelter` | `job_center` | `medical_center`
 
-## Why Not Render?
+Returns a JSON array of `{ place_id, name, formatted_address }`.
 
-We initially deployed the Express backend on Render, but the free tier spins down after inactivity — the first search could take 60+ seconds. Moving the API to Vercel serverless functions on the same domain fixed that.
+## Notes
+
+- Started with a separate Express host (Render); free-tier cold starts were slow, so production API moved onto Vercel.
+- OpenStreetMap Nominatim was explored for live search; rate limits made mock + typed contract the reliable demo path.
 
 ## License
 
