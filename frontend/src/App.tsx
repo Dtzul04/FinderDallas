@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { Place, CategoryId } from "./types"
+import { fetchPlaces } from './lib/fetchPlaces';
 
 /** Main component: UI + data layer. */
 function App()  {
@@ -27,8 +28,8 @@ function App()  {
       const res = await fetch(`${apiUrl}/api/places?category=${category}`, {
         signal: controller.signal,
       });
-      const data = await res.json();
-      setPlaces(Array.isArray(data) ? data : []);
+      const data = await fetchPlaces(category);
+      setPlaces(data);
     } catch {
       setPlaces([]);
     } finally {
