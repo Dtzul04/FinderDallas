@@ -20,20 +20,13 @@ function App()  {
     if (!category) return;
 
     setLoading(true);
-    const apiUrl = import.meta.env.VITE_API_URL || "";
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 12000);
-
+    
     try {
-      const res = await fetch(`${apiUrl}/api/places?category=${category}`, {
-        signal: controller.signal,
-      });
       const data = await fetchPlaces(category);
       setPlaces(data);
     } catch {
       setPlaces([]);
     } finally {
-      clearTimeout(timeout);
       setHasSearched(true);
       setLoading(false);
     }
