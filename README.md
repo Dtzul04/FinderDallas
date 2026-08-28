@@ -1,3 +1,5 @@
+[![CI](https://github.com/Dtzul04/FinderDallas/actions/workflows/ci.yml/badge.svg)](https://github.com/Dtzul04/FinderDallas/actions/workflows/ci.yml)
+
 # FinderDallas
 
 Find community resources in Dallas — food banks, shelters, job centers, and medical centers.
@@ -15,7 +17,7 @@ Find community resources in Dallas — food banks, shelters, job centers, and me
 
 **Production = Vercel only** (frontend + API on one URL).
 
-## Architecture (interview-ready)
+## Architecture 
 
 ```
 Browser (App.tsx)
@@ -28,12 +30,31 @@ Browser (App.tsx)
 | File | Role |
 |------|------|
 | `frontend/src/types.ts` | Shared types: `Place`, `CategoryId` |
-| `frontend/src/App.tsx` | UI + fetch |
+| `frontend/src/App.tsx` | State + handlers; composes UI components |
+| `frontend/src/lib/fetchPlaces.ts` | API client (`GET /api/places`) |
+| `frontend/src/components/` | Header, CategoryGrid, ResultsPanel, Footer |
 | `frontend/src/data/mockPlaces.ts` | Sample data + `getPlaces()` |
-| `frontend/api/places.ts` | HTTP handler only |
+| `frontend/api/places.ts` | HTTP handler only (must stay here for Vercel) |
 | `backend/` | Local Express (OSM try + mock fallback) — not used in production |
 
 **Why mock first?** Demos stay fast and free. The UI only depends on `Place[]`. To use your own database or API later, change **only** `getPlaces` — keep returning `Place[]`.
+
+## Project structure
+
+```
+frontend/
+  src/
+    components/   Header, CategoryGrid, ResultsPanel, Footer
+    constants/    categories.ts
+    lib/          fetchPlaces.ts
+    data/         mockPlaces.ts
+    types.ts
+    App.tsx       state + handlers
+  api/
+    places.ts     Vercel serverless handler (do not move)
+backend/          optional Express API for local practice
+.github/workflows/ci.yml
+```
 
 ### Bring your own database (optional)
 
@@ -81,6 +102,15 @@ Open http://localhost:5173
 2. Vercel → import repo → **Root Directory:** `frontend`  
 3. Do **not** set `VITE_API_URL` (production uses same-origin `/api/places`)  
 4. Deploy  
+
+## CI
+
+GitHub Actions runs on every push and pull request to `main`:
+
+- **frontend** — `npm run lint` and `npm run build`
+- **backend** — `npm run build`
+
+Workflow: `.github/workflows/ci.yml`
 
 ## API
 

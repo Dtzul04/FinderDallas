@@ -4,5 +4,11 @@ export type Place = {
     formatted_address: string;
 };
 
+export type Category = {
+    id: CategoryId;
+    name: string;
+    description: string;
+};
+
 /** Type for the category ID. */
 export type CategoryId =  "food_bank" | "shelter" | "job_center" | "medical_center";
