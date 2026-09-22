@@ -6,6 +6,30 @@ Find community resources in Dallas — food banks, shelters, job centers, and me
 
 **Live demo:** https://finder-dallas.vercel.app/
 
+## Migration in progress (Next.js)
+
+I am upgrading FinderDallas from React + Vite to **Next.js + TypeScript + Tailwind**.
+
+| Status | Item |
+|--------|------|
+| Done | Next.js scaffold in `finder-next/` (`src/app`, Tailwind, TypeScript) |
+| Next | Folder layout: `components/`, `lib/`, `types/` |
+| Next | Port types + category constants from `frontend/` |
+| Next | Port UI components (Header, CategoryGrid, ResultsPanel) |
+| Next | API route: `src/app/api/places/route.ts` (mock data first) |
+| Planned | Supabase (PostgreSQL) |
+| Planned | Search bar + category filtering |
+| Planned | Submit form for new resources |
+| Planned | Map view (Leaflet.js) |
+| Planned | User ratings |
+| Planned | Move app to repo root; retire `frontend/` and `backend/` |
+
+**Current dev (still in production):** `cd frontend && npm run dev` → http://localhost:5173
+
+**Current dev (migration — work in progress):** `cd finder-next && npm run dev` → http://localhost:3000
+
+**Production deploy:** still `frontend/` on Vercel until migration is complete.
+
 ## Stack
 
 | Layer | Tech |
