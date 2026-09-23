@@ -6,79 +6,100 @@ Find community resources in Dallas — food banks, shelters, job centers, and me
 
 **Live demo:** https://finder-dallas.vercel.app/
 
-## Migration in progress (Next.js)
-
-I am upgrading FinderDallas from React + Vite to **Next.js + TypeScript + Tailwind**.
-
-| Status | Item |
-|--------|------|
-| Done | Next.js scaffold in `finder-next/` (`src/app`, Tailwind, TypeScript) |
-| Next | Folder layout: `components/`, `lib/`, `types/` |
-| Next | Port types + category constants from `frontend/` |
-| Next | Port UI components (Header, CategoryGrid, ResultsPanel) |
-| Next | API route: `src/app/api/places/route.ts` (mock data first) |
-| Planned | Supabase (PostgreSQL) |
-| Planned | Search bar + category filtering |
-| Planned | Submit form for new resources |
-| Planned | Map view (Leaflet.js) |
-| Planned | User ratings |
-| Planned | Move app to repo root; retire `frontend/` and `backend/` |
-
-**Current dev (still in production):** `cd frontend && npm run dev` → http://localhost:5173
-
-**Current dev (migration — work in progress):** `cd finder-next && npm run dev` → http://localhost:3000
-
-**Production deploy:** still `frontend/` on Vercel until migration is complete.
-
 ## Stack
 
 | Layer | Tech |
 |-------|------|
-| UI | React, TypeScript, Vite, Tailwind CSS |
-| API | Vercel Serverless Function (`/api/places`) |
-| Data | Typed mock data (`Place[]`) — ready to swap for Postgres or any API |
-| Local practice | Express + TypeScript (`backend/`) — optional |
+| UI | Next.js, React, TypeScript, Tailwind CSS |
+| API | Next.js Route Handler (`/api/places`) |
+| Data | Typed mock data (`Place[]`) — ready to swap for Supabase/Postgres |
+| Deploy | Vercel (repo root) |
 
-**Production = Vercel only** (frontend + API on one URL).
+**Production = Vercel only** (UI + API on one URL).
 
-## Architecture 
+## Architecture
 
 ```
-Browser (App.tsx)
+Browser (page.tsx)
     → GET /api/places?category=food_bank
-    → api/places.ts          (validate request)
-    → getPlaces(category)    (data layer)
-    → Place[]                (same shape always)
+    → app/api/places/route.ts   (validate request)
+    → getPlaces(category)       (data layer)
+    → Place[]                   (same shape always)
 ```
 
 | File | Role |
 |------|------|
-| `frontend/src/types.ts` | Shared types: `Place`, `CategoryId` |
-| `frontend/src/App.tsx` | State + handlers; composes UI components |
-| `frontend/src/lib/fetchPlaces.ts` | API client (`GET /api/places`) |
-| `frontend/src/components/` | Header, CategoryGrid, ResultsPanel, Footer |
-| `frontend/src/data/mockPlaces.ts` | Sample data + `getPlaces()` |
-| `frontend/api/places.ts` | HTTP handler only (must stay here for Vercel) |
-| `backend/` | Local Express (OSM try + mock fallback) — not used in production |
+| `src/types/index.ts` | Shared types: `Place`, `CategoryId`, `Category` |
+| `src/app/page.tsx` | State + handlers; composes UI components |
+| `src/lib/fetchPlaces.ts` | API client (`GET /api/places`) |
+| `src/components/` | Header, CategoryGrid, ResultsPanel, Footer |
+| `src/data/mockPlaces.ts` | Sample data + `getPlaces()` |
+| `src/app/api/places/route.ts` | HTTP handler only |
 
-**Why mock first?** Demos stay fast and free. The UI only depends on `Place[]`. To use your own database or API later, change **only** `getPlaces` — keep returning `Place[]`.
+**Why mock first?** Demos stay fast and free. The UI only depends on `Place[]`. To use Supabase later, change **only** `getPlaces` — keep returning `Place[]`.
 
 ## Project structure
 
 ```
-frontend/
-  src/
-    components/   Header, CategoryGrid, ResultsPanel, Footer
-    constants/    categories.ts
-    lib/          fetchPlaces.ts
-    data/         mockPlaces.ts
-    types.ts
-    App.tsx       state + handlers
-  api/
-    places.ts     Vercel serverless handler (do not move)
-backend/          optional Express API for local practice
+src/
+  app/
+    page.tsx              home page (category select + search)
+    layout.tsx            shell (Header, Footer)
+    api/places/route.ts   API route
+  components/             Header, CategoryGrid, ResultsPanel, Footer
+  constants/              categories.ts
+  lib/                    fetchPlaces.ts
+  data/                   mockPlaces.ts
+  types/                  index.ts
 .github/workflows/ci.yml
 ```
+
+## Roadmap
+
+| Status | Item |
+|--------|------|
+| Done | Next.js migration from React + Vite |
+| Done | Category grid + search + results (mock data) |
+| Done | Clean repo root structure (`src/` at top level) |
+| Planned | Supabase (PostgreSQL) |
+| Planned | Search bar + text filtering |
+| Planned | Submit form for new resources |
+| Planned | Map view (Leaflet.js) |
+| Planned | User ratings |
+
+## Local development
+
+```bash
+npm install
+npm run dev
+```
+
+Open http://localhost:3000
+
+## Deploy (Vercel)
+
+1. Push to GitHub  
+2. Vercel → your project → **Settings → General → Root Directory**  
+3. Set Root Directory to **`.`** (repo root — was `frontend`, then `finder-next`)  
+4. Save and redeploy  
+
+No extra env vars needed for mock data. When Supabase is added, set server-side keys in Vercel (never commit `.env`).
+
+## CI
+
+GitHub Actions runs on every push and pull request to `main`:
+
+- **app** — `npm run lint` and `npm run build`
+
+Workflow: `.github/workflows/ci.yml`
+
+## API
+
+`GET /api/places?category=<id>`
+
+Categories: `food_bank` | `shelter` | `job_center` | `medical_center`
+
+Returns a JSON array of `{ place_id, name, formatted_address }`.
 
 ### Bring your own database (optional)
 
@@ -103,50 +124,11 @@ CREATE TABLE places (
 );
 ```
 
-Then replace the body of `getPlaces` with a query filtered by `category`. Hosts: local Postgres, Neon, Supabase, etc. — any Postgres with a connection string works the same idea.
-
-## Local development
-
-```bash
-# Optional: Express API on port 5001
-cd backend && npm install && npm run dev
-
-# Frontend on port 5173
-cd frontend && npm install && npm run dev
-```
-
-Open http://localhost:5173
-
-- With Express: set `VITE_API_URL=http://localhost:5001` in `frontend/.env` (see `.env.example`)
-- Without Express: use `vercel dev` in `frontend/` so `/api/places` works, or keep pointing at the live API for UI-only work
-
-## Deploy
-
-1. Push to GitHub  
-2. Vercel → import repo → **Root Directory:** `frontend`  
-3. Do **not** set `VITE_API_URL` (production uses same-origin `/api/places`)  
-4. Deploy  
-
-## CI
-
-GitHub Actions runs on every push and pull request to `main`:
-
-- **frontend** — `npm run lint` and `npm run build`
-- **backend** — `npm run build`
-
-Workflow: `.github/workflows/ci.yml`
-
-## API
-
-`GET /api/places?category=<id>`
-
-Categories: `food_bank` | `shelter` | `job_center` | `medical_center`
-
-Returns a JSON array of `{ place_id, name, formatted_address }`.
+Then replace the body of `getPlaces` with a Supabase query filtered by `category`.
 
 ## Notes
 
-- Started with a separate Express host (Render); free-tier cold starts were slow, so production API moved onto Vercel.
+- Migrated from React + Vite and optional Express to Next.js in September 2026.
 - OpenStreetMap Nominatim was explored for live search; rate limits made mock + typed contract the reliable demo path.
 
 ## License
