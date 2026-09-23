@@ -61,11 +61,12 @@ src/
 | Done | Next.js migration from React + Vite |
 | Done | Category grid + search + results (mock data) |
 | Done | Clean repo root structure (`src/` at top level) |
-| Planned | Supabase (PostgreSQL) |
-| Planned | Search bar + text filtering |
-| Planned | Submit form for new resources |
-| Planned | Map view (Leaflet.js) |
-| Planned | User ratings |
+| Done | Supabase (PostgreSQL) |
+| Done | Connect `/api/places` to Supabase |
+| Next | Search bar + text filtering |
+| Next | Submit form for new resources |
+| Next | Map view (Leaflet.js) |
+| Next | User ratings |
 
 ## Local development
 
