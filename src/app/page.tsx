@@ -6,6 +6,7 @@ import { ResultsPanel } from "@/components/ResultsPanel";
 import { categories } from "@/constants/categories";
 import { fetchPlaces } from "@/lib/fetchPlaces";
 import type { CategoryId, Place } from "@/types";
+import SearchBar from "@/components/SearchBar";
 
 export default function Home() {
   const [category, setCategory] = useState<CategoryId | "">("");
@@ -13,11 +14,13 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [searchText, setSearchText] = useState("");
 
   function handleCategorySelect(id: CategoryId) {
     setCategory(id);
     setHasSearched(false);
     setPlaces([]);
+    setSearchText("");
     setError(null);
   }
 
@@ -39,6 +42,17 @@ export default function Home() {
     }
   }
 
+  const query = searchText.trim().toLowerCase();
+
+  const filteredPlaces = 
+    query === ""
+      ? places
+      : places.filter(
+          (place) => 
+            place.name.toLowerCase().includes(query) || 
+            place.formatted_address.toLowerCase().includes(query),
+          );
+
   return (
     <main className="flex-1 w-full max-w-3xl mx-auto px-4 py-8 flex flex-col gap-6">
       <h2 className="text-2xl font-bold text-center text-gray-800">
@@ -51,6 +65,11 @@ export default function Home() {
         onSelect={handleCategorySelect}
       />
 
+      <SearchBar
+        value={searchText}
+        onChange={setSearchText}
+      />
+      
       <div className="text-center">
         <button
           type="button"
@@ -63,7 +82,7 @@ export default function Home() {
       </div>
 
       <ResultsPanel
-        places={places}
+        places={filteredPlaces}
         loading={loading}
         hasSearched={hasSearched}
         error={error}
