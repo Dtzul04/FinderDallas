@@ -1,5 +1,6 @@
 import type { Category, CategoryId } from "@/types";
 
+// tells page which category was picked
 type CategoryGridProps = {
   categories: Category[];
   selectedCategory: CategoryId | "";
@@ -18,14 +19,16 @@ export function CategoryGrid({
           key={cat.id}
           type="button"
           onClick={() => onSelect(cat.id)}
-          className={`text-left p-6 rounded-xl border-2 bg-white shadow-sm hover:shadow-md transition-shadow ${
+          className={`text-left rounded-2xl border-2 bg-white p-5 shadow-sm transition-all hover:border-emerald-200 hover:shadow-md sm:p-6 ${
             selectedCategory === cat.id
-              ? "border-emerald-600 ring-2 ring-emerald-300"
-              : "border-gray-200"
+              ? "border-emerald-600 bg-emerald-50/40 ring-2 ring-emerald-500/20"
+              : "border-slate-200"
           }`}
         >
-          <h3 className="text-lg font-bold text-emerald-700">{cat.name}</h3>
-          <p className="text-gray-600 mt-2">{cat.description}</p>
+          <h3 className="text-lg font-semibold text-emerald-800">{cat.name}</h3>
+          <p className="mt-2 text-sm leading-relaxed text-slate-600">
+            {cat.description}
+          </p>
         </button>
       ))}
     </div>

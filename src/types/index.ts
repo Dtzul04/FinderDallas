@@ -1,3 +1,4 @@
+// same JSON shape the API returns
 export type Place = {
     place_id: string;
     name: string;
@@ -10,5 +11,5 @@ export type Category = {
     description: string;
 };
 
-/** Type for the category ID. */
-export type CategoryId =  "food_bank" | "shelter" | "job_center" | "medical_center";
+// also used as the category column in Supabase
+export type CategoryId = "food_bank" | "shelter" | "job_center" | "medical_center";

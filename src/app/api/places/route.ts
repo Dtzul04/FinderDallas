@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { categoryQueries, getPlaces } from "@/data/mockPlaces";
+import { supabase } from "@/lib/supabase";
 import type { CategoryId } from "@/types";
 
+// GET /api/places?category=food_bank
 export async function GET(request: NextRequest) {
   const category = request.nextUrl.searchParams.get("category");
 
@@ -13,9 +14,15 @@ export async function GET(request: NextRequest) {
   }
 
   const key = category as CategoryId;
-  if (!categoryQueries[key]) {
-    return NextResponse.json({ error: "Invalid category" }, { status: 400 });
+
+  const { data, error } = await supabase
+    .from("places")
+    .select("place_id, name, formatted_address")
+    .eq("category", key); // must match CategoryId in types
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json(getPlaces(key));
+  return NextResponse.json(data ?? []);
 }
