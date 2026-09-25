@@ -1,3 +1,4 @@
+// needs useState and click handlers
 "use client";
 
 import { useState } from "react";
@@ -24,6 +25,7 @@ export default function Home() {
     setError(null);
   }
 
+  // one API call per category search
   async function handleSearch() {
     if (!category) return;
 
@@ -42,51 +44,61 @@ export default function Home() {
     }
   }
 
+  // filter on the client — no extra trip to Supabase
   const query = searchText.trim().toLowerCase();
 
-  const filteredPlaces = 
+  const filteredPlaces =
     query === ""
       ? places
       : places.filter(
-          (place) => 
-            place.name.toLowerCase().includes(query) || 
+          (place) =>
+            place.name.toLowerCase().includes(query) ||
             place.formatted_address.toLowerCase().includes(query),
-          );
+        );
 
   return (
-    <main className="flex-1 w-full max-w-3xl mx-auto px-4 py-8 flex flex-col gap-6">
-      <h2 className="text-2xl font-bold text-center text-gray-800">
-        What are you looking for?
-      </h2>
+    <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-8 px-4 py-8 sm:px-6 sm:py-10">
+      <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
+        <h2 className="text-center text-2xl font-bold tracking-tight text-slate-900">
+          What are you looking for?
+        </h2>
+        <p className="mt-2 text-center text-sm text-slate-600">
+          Select a category, then search our database.
+        </p>
 
-      <CategoryGrid
-        categories={categories}
-        selectedCategory={category}
-        onSelect={handleCategorySelect}
-      />
+        <div className="mt-6">
+          <CategoryGrid
+            categories={categories}
+            selectedCategory={category}
+            onSelect={handleCategorySelect}
+          />
+        </div>
 
-      <SearchBar
-        value={searchText}
-        onChange={setSearchText}
-      />
-      
-      <div className="text-center">
-        <button
-          type="button"
-          onClick={handleSearch}
-          disabled={!category || loading}
-          className="px-8 py-3 rounded-xl bg-emerald-600 text-white font-bold hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {loading ? "Searching..." : "Search"}
-        </button>
+        <div className="mt-8 flex flex-col gap-4">
+          <button
+            type="button"
+            onClick={handleSearch}
+            disabled={!category || loading}
+            className="w-full rounded-xl bg-emerald-600 px-8 py-3.5 text-center font-semibold text-white shadow-sm transition-colors hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:self-center"
+          >
+            {loading ? "Searching..." : "Search resources"}
+          </button>
+        </div>
       </div>
 
-      <ResultsPanel
-        places={filteredPlaces}
-        loading={loading}
-        hasSearched={hasSearched}
-        error={error}
-      />
+      {hasSearched && (
+        <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
+          <SearchBar value={searchText} onChange={setSearchText} />
+          <div className="mt-6">
+            <ResultsPanel
+              places={filteredPlaces}
+              loading={loading}
+              hasSearched={hasSearched}
+              error={error}
+            />
+          </div>
+        </div>
+      )}
     </main>
   );
 }

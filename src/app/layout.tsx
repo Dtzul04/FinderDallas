@@ -19,13 +19,14 @@ export const metadata: Metadata = {
   description: "Find community resources in Dallas Metroplex",
 };
 
+// header + footer on every page
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-gray-50">
+      <body className="min-h-full flex flex-col bg-slate-50 text-slate-900">
         <Header />
         {children}
         <Footer />

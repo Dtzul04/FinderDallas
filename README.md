@@ -6,49 +6,26 @@ Find community resources in Dallas — food banks, shelters, job centers, and me
 
 **Live demo:** https://finder-dallas.vercel.app/
 
+Pick a category, load places from Supabase, then filter by name or address in the browser.
+
 ## Stack
 
-| Layer | Tech |
-|-------|------|
-| UI | Next.js, React, TypeScript, Tailwind CSS |
-| API | Next.js Route Handler (`/api/places`) |
-| Data | Supabase (PostgreSQL); `Place[]` contract in TypeScript |
-| Deploy | Vercel (repo root) |
+Next.js · TypeScript · Tailwind · Supabase (PostgreSQL) · Vercel
 
-**Production = Vercel only** (UI + API on one URL).
-
-## Architecture
+## How it works
 
 ```
-Browser (page.tsx)
-    → GET /api/places?category=food_bank
-    → app/api/places/route.ts   (validate request)
-    → Supabase query            (data layer)
-    → Place[]                   (same shape always)
+page.tsx → GET /api/places?category=… → Supabase → filter in browser (SearchBar)
 ```
-
-| File | Role |
-|------|------|
-| `src/types/index.ts` | Shared types: `Place`, `CategoryId`, `Category` |
-| `src/app/page.tsx` | State + handlers; composes UI components |
-| `src/lib/fetchPlaces.ts` | API client (`GET /api/places`) |
-| `src/lib/supabase.ts` | Server-side Supabase client (env vars) |
-| `src/components/` | Header, CategoryGrid, ResultsPanel, Footer |
-| `src/app/api/places/route.ts` | HTTP handler + DB query |
 
 ## Project structure
 
 ```
-src/
-  app/
-    page.tsx              home page (category select + search)
-    layout.tsx            shell (Header, Footer)
-    api/places/route.ts   API route
-  components/             Header, CategoryGrid, ResultsPanel, Footer, SearchBar
-  constants/              categories.ts
-  lib/                    fetchPlaces.ts, supabase.ts
-  types/                  index.ts
-.github/workflows/ci.yml
+src/app/          page, layout, api/places/route.ts
+src/components/   Header, CategoryGrid, SearchBar, ResultsPanel, Footer
+src/lib/          fetchPlaces.ts, supabase.ts
+src/constants/    categories.ts
+src/types/        Place, CategoryId
 ```
 
 ## Roadmap
@@ -61,33 +38,35 @@ src/
 | Done | Supabase (PostgreSQL) |
 | Done | Connect `/api/places` to Supabase |
 | Done | Search bar + text filtering |
-| Next | Submit form for new resources |
-| Next | Map view (Leaflet.js) |
-| Next | User ratings |
+| Done | UI styling (Tailwind layout, cards, header/footer) |
+
+## Data & attribution
+
+Listings are stored in Supabase and were built from public directories, mainly the **[Now Forward Dallas Area Guide to Emergency Assistance](https://now-forward.org/)** (emergency assistance guidebook). Always confirm hours and services with each organization — this app is not an official city listing.
+
+Category values in the database must match the app: `food_bank`, `shelter`, `job_center`, `medical_center`.
 
 ## Local development
 
 ```bash
 npm install
+cp .env.example .env.local   # add Supabase URL + anon key
 npm run dev
 ```
 
-Open http://localhost:3000
+Env vars (see `src/lib/supabase.ts`): `FINDER_DALLAS_API_URL`, `SUPABASE_ANON_KEY`
 
 ## Deploy (Vercel)
 
-1. Push to GitHub  
-2. Vercel → your project → **Settings → General → Root Directory**  
-3. Set Root Directory to **`.`** (repo root — was `frontend`, then `finder-next`)  
-4. Save and redeploy  
+- Root directory: **`.`**
+- Same env vars as local → **Settings → Environment Variables**
+- Redeploy after adding secrets
 
-Set Supabase env vars in Vercel (same names as `.env.local`; see `.env.example`). Never commit `.env.local`.
+## API
 
-## Notes
-
-- Migrated from React + Vite and optional Express to Next.js in September 2026.
+`GET /api/places?category=<id>` → JSON array of `{ place_id, name, formatted_address }`
 
 ## License
 
-Help me figure this out soon 
-
+- **Code:** [ISC](LICENSE)
+- **Data:** factual listings from third-party guides (see Data & attribution above); not redistributed as a standalone dataset
