@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { getSupabase } from "@/lib/supabase";
 import type { CategoryId } from "@/types";
 
 // GET /api/places?category=food_bank
@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
 
   const key = category as CategoryId;
 
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from("places")
     .select("place_id, name, formatted_address")
     .eq("category", key); // must match CategoryId in types

@@ -1,11 +1,18 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
-// keys live in .env.local (and Vercel env vars)
-const url = process.env.FINDER_DALLAS_API_URL;
-const key = process.env.SUPABASE_ANON_KEY;
+// Lazy client so `next build` works in CI without secrets (env only needed at runtime).
+let supabase: SupabaseClient | null = null;
 
-if (!url || !key) {
-    throw new Error("Missing Supabase nev vars");
+export function getSupabase(): SupabaseClient {
+  if (supabase) return supabase;
+
+  const url = process.env.FINDER_DALLAS_API_URL;
+  const key = process.env.SUPABASE_ANON_KEY;
+
+  if (!url || !key) {
+    throw new Error("Missing Supabase env vars");
+  }
+
+  supabase = createClient(url, key);
+  return supabase;
 }
-
-export const supabase = createClient(url, key);
