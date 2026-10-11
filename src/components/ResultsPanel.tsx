@@ -30,7 +30,7 @@ export function ResultsPanel({
       </div>
 
       <div className="h-96 w-full shrink-0 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50/50 shadow-inner">
-        <div className="flex h-full flex-col overflow-y-auto p-4">
+        <div className="flex h-full flex-col overflow-y-auto p-4" aria-live="polite">
           {loading && (
             <p className="m-auto text-center text-slate-500">Searching...</p>
           )}

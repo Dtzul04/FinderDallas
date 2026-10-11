@@ -22,7 +22,8 @@ export function CategoryGrid({
           type="button"
           onClick={() => onSelect(cat.id)}
           disabled={disabled}
-          className={`text-left rounded-2xl border-2 bg-white p-5 shadow-sm transition-all hover:border-emerald-200 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50 sm:p-6 ${
+          aria-pressed={selectedCategory === cat.id}
+          className={`text-left rounded-2xl border-2 bg-white p-5 shadow-sm transition-all hover:border-emerald-200 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 sm:p-6 ${
             selectedCategory === cat.id
               ? "border-emerald-600 bg-emerald-50/40 ring-2 ring-emerald-500/20"
               : "border-slate-200"

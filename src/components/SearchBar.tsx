@@ -15,7 +15,7 @@ export default function SearchBar({ value, onChange }: SearchBarProps) {
         value={value ?? ""}
         onChange={(e) => onChange(e.target.value)}
         placeholder="Search by name or address..."
-        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 shadow-sm placeholder:text-slate-400 transition-shadow focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/25"
+        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 shadow-sm placeholder:text-slate-500 transition-shadow focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/25"
       />
     </label>
   );
