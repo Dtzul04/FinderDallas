@@ -8,6 +8,7 @@ import { categories } from "@/constants/categories";
 import { fetchPlaces } from "@/lib/fetchPlaces";
 import type { CategoryId, Place } from "@/types";
 import SearchBar from "@/components/SearchBar";
+import CategorySearch from "@/components/CategorySearch";
 
 export default function Home() {
   const [category, setCategory] = useState<CategoryId | "">("");
@@ -16,6 +17,7 @@ export default function Home() {
   const [hasSearched, setHasSearched] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searchText, setSearchText] = useState("");
+  const [categoryFilterText, setCategoryFilterText] = useState(""); // text typed in the category search box
 
   // new category = reset old results
   function handleCategorySelect(id: CategoryId) {
@@ -60,6 +62,15 @@ export default function Home() {
             place.formatted_address.toLowerCase().includes(query),
         );
 
+  // filter category cards by name or description; empty text matches all
+  const categoryQuery = categoryFilterText.trim().toLowerCase();
+
+  const filteredCategories = categories.filter(
+    (cat) =>
+      cat.name.toLowerCase().includes(categoryQuery) ||
+      cat.description.toLowerCase().includes(categoryQuery),
+  );
+
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-8 px-4 py-8 sm:px-6 sm:py-10">
       <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
@@ -71,12 +82,25 @@ export default function Home() {
         </p>
 
         <div className="mt-6">
-          <CategoryGrid
-            categories={categories}
-            selectedCategory={category}
-            onSelect={handleCategorySelect}
-            disabled={loading} // no switching categories mid-search
+          <CategorySearch
+            value={categoryFilterText}
+            onChange={setCategoryFilterText}
           />
+        </div>
+
+        <div className="mt-6">
+          {filteredCategories.length > 0 ? (
+            <CategoryGrid
+              categories={filteredCategories} // only cards matching the search box
+              selectedCategory={category}
+              onSelect={handleCategorySelect}
+              disabled={loading} // no switching categories mid-search
+            />
+          ) : (
+            <p className="py-6 text-center text-sm text-slate-500">
+              No categories match your search.
+            </p>
+          )}
         </div>
 
         <div className="mt-8 flex flex-col gap-4">

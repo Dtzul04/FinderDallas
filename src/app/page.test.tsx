@@ -41,6 +41,26 @@ describe("Home page", () => {
     expect(screen.getByRole("button", { name: /search resources/i })).toBeDisabled();
   });
 
+  it("filters category cards and shows a message when none match", async () => {
+    const user = userEvent.setup();
+    render(<Home />);
+    const categorySearch = screen.getByRole("searchbox", { name: /search categories/i });
+
+    // "food" should leave only Food Bank
+    await user.type(categorySearch, "food");
+    expect(screen.getByRole("button", { name: /food bank/i })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /shelter/i })).not.toBeInTheDocument();
+
+    // nothing matches "zzzz"
+    await user.clear(categorySearch);
+    await user.type(categorySearch, "zzzz");
+    expect(screen.getByText(/no categories match your search/i)).toBeInTheDocument();
+
+    // clearing brings every category back
+    await user.clear(categorySearch);
+    expect(screen.getAllByRole("button", { pressed: false })).toHaveLength(4);
+  });
+
   // the real database can't be made to fail on demand, so fake a 500 here
   it("shows the error message when the API fails", async () => {
     vi.stubGlobal("fetch", async () =>
