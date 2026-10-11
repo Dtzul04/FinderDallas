@@ -21,7 +21,12 @@ export async function GET(request: NextRequest) {
     .eq("category", key); // must match CategoryId in types
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    // real error goes to the server log, users get a friendly message
+    console.error("Supabase error:", error.message);
+    return NextResponse.json(
+      { error: "Something went wrong loading resources. Please try again." },
+      { status: 500 },
+    );
   }
 
   return NextResponse.json(data ?? []);

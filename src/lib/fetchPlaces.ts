@@ -6,7 +6,8 @@ export async function fetchPlaces(category: CategoryId): Promise<Place[]> {
   const res = await fetch(url);
 
   if (!res.ok) {
-    throw new Error("Request failed");
+    const body = await res.json();
+    throw new Error(body.error || "Something went wrong");
   }
 
   const data = await res.json();

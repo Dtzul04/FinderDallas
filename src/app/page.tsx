@@ -17,6 +17,7 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [searchText, setSearchText] = useState("");
 
+  // new category = reset old results
   function handleCategorySelect(id: CategoryId) {
     setCategory(id);
     setHasSearched(false);
@@ -35,9 +36,12 @@ export default function Home() {
     try {
       const data = await fetchPlaces(category);
       setPlaces(data);
-    } catch {
+    } catch (err) {
+      // show the API's message if we have one
       setPlaces([]);
-      setError("Failed to fetch places. Please try again.");
+      setError(
+        err instanceof Error ? err.message : "Failed to fetch places. Please try again.",
+      );
     } finally {
       setHasSearched(true);
       setLoading(false);
@@ -71,6 +75,7 @@ export default function Home() {
             categories={categories}
             selectedCategory={category}
             onSelect={handleCategorySelect}
+            disabled={loading} // no switching categories mid-search
           />
         </div>
 
@@ -86,12 +91,14 @@ export default function Home() {
         </div>
       </div>
 
-      {hasSearched && (
+      {/* show panel while loading or after a search */}
+      { (loading || hasSearched) && (
         <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
           <SearchBar value={searchText} onChange={setSearchText} />
           <div className="mt-6">
             <ResultsPanel
               places={filteredPlaces}
+              totalCount={places.length} // lets the panel tell "no data" from "no filter matches"
               loading={loading}
               hasSearched={hasSearched}
               error={error}
