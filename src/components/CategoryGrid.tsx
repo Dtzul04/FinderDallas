@@ -5,12 +5,14 @@ type CategoryGridProps = {
   categories: Category[];
   selectedCategory: CategoryId | "";
   onSelect: (id: CategoryId) => void;
+  disabled?: boolean; // true while a search is loading
 };
 
 export function CategoryGrid({
   categories,
   selectedCategory,
   onSelect,
+  disabled = false,
 }: CategoryGridProps) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -19,7 +21,8 @@ export function CategoryGrid({
           key={cat.id}
           type="button"
           onClick={() => onSelect(cat.id)}
-          className={`text-left rounded-2xl border-2 bg-white p-5 shadow-sm transition-all hover:border-emerald-200 hover:shadow-md sm:p-6 ${
+          disabled={disabled}
+          className={`text-left rounded-2xl border-2 bg-white p-5 shadow-sm transition-all hover:border-emerald-200 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50 sm:p-6 ${
             selectedCategory === cat.id
               ? "border-emerald-600 bg-emerald-50/40 ring-2 ring-emerald-500/20"
               : "border-slate-200"

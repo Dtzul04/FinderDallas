@@ -3,6 +3,7 @@ import type { Place } from "@/types";
 // loading / empty / error / list states
 type ResultsPanelProps = {
   places: Place[];
+  totalCount: number; // count before the filter text is applied
   loading: boolean;
   hasSearched: boolean;
   error: string | null;
@@ -10,6 +11,7 @@ type ResultsPanelProps = {
 
 export function ResultsPanel({
   places,
+  totalCount,
   loading,
   hasSearched,
   error,
@@ -46,11 +48,23 @@ export function ResultsPanel({
             </p>
           )}
 
-          {!loading && hasSearched && !error && places.length === 0 && (
+          {/* category has nothing in the database */}
+          {!loading && hasSearched && !error && totalCount === 0 && (
             <p className="m-auto max-w-xs text-center text-sm text-slate-500">
-              No matches. Try another category or clear your filter text.
+              No resources found for this category yet. Try another category.
             </p>
           )}
+
+          {/* category has results, but the filter text hides them all */}
+          {!loading &&
+            hasSearched &&
+            !error &&
+            totalCount > 0 &&
+            places.length === 0 && (
+              <p className="m-auto max-w-xs text-center text-sm text-slate-500">
+                No matches for your filter. Try different words or clear it.
+              </p>
+            )}
 
           {!loading &&
             hasSearched &&
