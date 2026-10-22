@@ -1,4 +1,3 @@
-// needs useState and click handlers
 "use client";
 
 import { useState } from "react";

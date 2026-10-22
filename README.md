@@ -22,7 +22,7 @@ page.tsx → GET /api/places?category=… → Supabase → filter in browser (Se
 
 ```
 src/app/          page, layout, api/places/route.ts
-src/components/   Header, CategoryGrid, SearchBar, ResultsPanel, Footer
+src/components/   Header, CategoryGrid, CategorySearch, SearchBar, ResultsPanel, Footer
 src/lib/          fetchPlaces.ts, supabase.ts
 src/constants/    categories.ts
 src/types/        Place, CategoryId
@@ -52,6 +52,7 @@ Category values in the database must match the app: `food_bank`, `shelter`, `job
 npm install
 cp .env.example .env.local   # add Supabase URL + anon key
 npm run dev
+npm test                     # Vitest; DB integration tests skip without env vars
 ```
 
 Env vars (see `src/lib/supabase.ts`): `FINDER_DALLAS_API_URL`, `SUPABASE_ANON_KEY`
