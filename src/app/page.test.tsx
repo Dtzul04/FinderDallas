@@ -69,7 +69,9 @@ describe("Home page", () => {
 
     await searchCategory(/job center/i);
 
-    expect(await screen.findByText("Something went wrong loading resources.")).toBeInTheDocument();
+    expect(
+      await screen.findByRole("alert"),
+    ).toHaveTextContent("Something went wrong loading resources.");
   });
 });
 
@@ -102,6 +104,7 @@ describe.skipIf(!hasDatabase)("Home page with the real database", () => {
 
     await user.clear(filter);
     await user.type(filter, "zzzz");
-    expect(screen.getByText(/no matches for your filter/i)).toBeInTheDocument();
+    // same message in visible UI and sr-only status for assistive tech
+    expect(screen.getAllByText(/no matches for your filter/i)).toHaveLength(2);
   }, 20000);
 });

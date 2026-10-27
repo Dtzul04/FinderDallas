@@ -6,11 +6,12 @@ type SearchBarProps = {
 
 export default function SearchBar({ value, onChange }: SearchBarProps) {
   return (
-    <label className="flex flex-col gap-1.5">
+    <label className="flex flex-col gap-1.5" htmlFor="results-filter">
       <span className="text-sm font-medium text-slate-700">
         Filter results
       </span>
       <input
+        id="results-filter"
         type="search"
         value={value ?? ""}
         onChange={(e) => onChange(e.target.value)}
