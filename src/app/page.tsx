@@ -96,7 +96,11 @@ export default function Home() {
               disabled={loading} // no switching categories mid-search
             />
           ) : (
-            <p className="py-6 text-center text-sm text-slate-500">
+            <p
+              role="status"
+              aria-live="polite"
+              className="py-6 text-center text-sm text-slate-500"
+            >
               No categories match your search.
             </p>
           )}

@@ -6,11 +6,12 @@ type CategorySearchProps = {
 
 export default function CategorySearch({ value, onChange }: CategorySearchProps) {
   return (
-    <label className="flex flex-col gap-1.5">
+    <label className="flex flex-col gap-1.5" htmlFor="category-search">
       <span className="text-sm font-medium text-slate-700">
         Search categories
       </span>
       <input
+        id="category-search"
         type="search"
         value={value ?? ""}
         onChange={(e) => onChange(e.target.value)}

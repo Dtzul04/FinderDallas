@@ -9,6 +9,31 @@ type ResultsPanelProps = {
   error: string | null;
 };
 
+function getStatusMessage(
+  places: Place[],
+  totalCount: number,
+  loading: boolean,
+  hasSearched: boolean,
+  error: string | null,
+): string {
+  if (loading) return "Searching for resources.";
+  if (error) return error;
+  if (!hasSearched) {
+    return "Choose a category and tap Search to see resources from the database.";
+  }
+  if (totalCount === 0) {
+    return "No resources found for this category yet. Try another category.";
+  }
+  if (places.length === 0) {
+    return "No matches for your filter. Try different words or clear it.";
+  }
+  const noun = places.length === 1 ? "place" : "places";
+  if (places.length < totalCount) {
+    return `Showing ${places.length} of ${totalCount} ${noun}.`;
+  }
+  return `${places.length} ${noun} found.`;
+}
+
 export function ResultsPanel({
   places,
   totalCount,
@@ -17,17 +42,37 @@ export function ResultsPanel({
   error,
 }: ResultsPanelProps) {
   const showCount = hasSearched && !loading && !error && places.length > 0;
+  const statusMessage = getStatusMessage(
+    places,
+    totalCount,
+    loading,
+    hasSearched,
+    error,
+  );
 
   return (
-    <section className="flex flex-col gap-3">
+    <section
+      className="flex flex-col gap-3"
+      aria-labelledby="results-heading"
+      aria-busy={loading}
+    >
       <div className="flex items-center justify-between gap-2 px-1">
-        <h3 className="text-lg font-semibold text-slate-800">Results</h3>
+        <h3 id="results-heading" className="text-lg font-semibold text-slate-800">
+          Results
+        </h3>
         {showCount && (
-          <span className="rounded-full bg-emerald-100 px-3 py-0.5 text-xs font-medium text-emerald-800">
+          <span
+            className="rounded-full bg-emerald-100 px-3 py-0.5 text-xs font-medium text-emerald-800"
+            aria-hidden="true"
+          >
             {places.length} {places.length === 1 ? "place" : "places"}
           </span>
         )}
       </div>
+
+      <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+        {statusMessage}
+      </p>
 
       <div className="h-96 w-full shrink-0 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50/50 shadow-inner">
         <div className="flex h-full flex-col overflow-y-auto p-4" aria-live="polite">
@@ -43,7 +88,10 @@ export function ResultsPanel({
           )}
 
           {!loading && error && (
-            <p className="m-auto text-center text-sm font-medium text-red-600">
+            <p
+              role="alert"
+              className="m-auto text-center text-sm font-medium text-red-600"
+            >
               {error}
             </p>
           )}

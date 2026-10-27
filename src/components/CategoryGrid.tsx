@@ -15,9 +15,10 @@ export function CategoryGrid({
   disabled = false,
 }: CategoryGridProps) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4" role="group" aria-label="Resource categories">
       {categories.map((cat) => (
         <button
+          aria-label={`${cat.name}. ${cat.description}`}
           key={cat.id}
           type="button"
           onClick={() => onSelect(cat.id)}
