@@ -55,13 +55,20 @@ npm run dev
 npm test                     # Vitest; DB integration tests skip without env vars
 ```
 
-Env vars (see `src/lib/supabase.ts`): `FINDER_DALLAS_API_URL`, `SUPABASE_ANON_KEY`
+### Environment variables
+
+Copy `.env.example` to `.env.local` and fill in both values from the Supabase project (**Project Settings → API**). The app reads them only when a request loads places. If one is missing, the server log names it.
+
+| Variable | What it is |
+|----------|------------|
+| `FINDER_DALLAS_API_URL` | Supabase project URL |
+| `SUPABASE_ANON_KEY` | Supabase anon (public) key |
 
 ## Deploy (Vercel)
 
 - Root directory: **`.`**
-- Same env vars as local → **Settings → Environment Variables**
-- Redeploy after adding secrets
+- Add the same two variables under **Settings → Environment Variables**
+- Redeploy after adding them
 
 ## API
 
