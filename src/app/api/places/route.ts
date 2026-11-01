@@ -15,19 +15,28 @@ export async function GET(request: NextRequest) {
 
   const key = category as CategoryId;
 
-  const { data, error } = await getSupabase()
-    .from("places")
-    .select("place_id, name, formatted_address")
-    .eq("category", key); // must match CategoryId in types
+  try {
+    const { data, error } = await getSupabase()
+      .from("places")
+      .select("place_id, name, formatted_address")
+      .eq("category", key); // must match CategoryId in types
 
-  if (error) {
-    // real error goes to the server log, users get a friendly message
-    console.error("Supabase error:", error.message);
+    if (error) {
+      // real error goes to the server log, users get a friendly message
+      console.error("Supabase error:", error.message);
+      return NextResponse.json(
+        { error: "Something went wrong loading resources. Please try again." },
+        { status: 500 },
+      );
+    }
+
+    return NextResponse.json(data ?? []);
+  } catch (err) {
+    // missing env vars throw here; log the details, keep the response generic
+    console.error("Supabase config error:", err);
     return NextResponse.json(
       { error: "Something went wrong loading resources. Please try again." },
       { status: 500 },
     );
   }
-
-  return NextResponse.json(data ?? []);
 }
