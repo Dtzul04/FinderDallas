@@ -11,5 +11,5 @@ export type Category = {
     description: string;
 };
 
-// also used as the category column in Supabase
+// ids used in the UI and in Google Places search queries
 export type CategoryId = "food_bank" | "shelter" | "job_center" | "medical_center";

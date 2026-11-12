@@ -6,12 +6,10 @@ import Home from "./page";
 import { GET } from "./api/places/route";
 
 const realFetch = globalThis.fetch;
-const hasDatabase = Boolean(
-  process.env.FINDER_DALLAS_API_URL && process.env.SUPABASE_ANON_KEY,
-);
+const hasPlacesKey = Boolean(process.env.GOOGLE_PLACES_API_KEY);
 
 // there is no Next.js server in tests, so send "/api/places" calls
-// straight to the real route handler; everything else (Supabase) uses real fetch
+// straight to the real route handler; Google Places uses real fetch
 function routeApiToHandler() {
   vi.stubGlobal("fetch", (input: RequestInfo | URL, init?: RequestInit) => {
     const url = input.toString();
@@ -75,8 +73,8 @@ describe("Home page", () => {
   });
 });
 
-// skipped when Supabase env vars are missing
-describe.skipIf(!hasDatabase)("Home page with the real database", () => {
+// skipped when the Google Places API key is missing
+describe.skipIf(!hasPlacesKey)("Home page with live Places results", () => {
   beforeEach(() => {
     routeApiToHandler();
   });
