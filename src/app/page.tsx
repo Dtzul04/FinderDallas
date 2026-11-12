@@ -49,7 +49,7 @@ export default function Home() {
     }
   }
 
-  // filter on the client — no extra trip to Supabase
+  // filter on the client — no extra Places request
   const query = searchText.trim().toLowerCase();
 
   const filteredPlaces =
